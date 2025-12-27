@@ -1,8 +1,13 @@
 {
-  "functions": [
+  "version": 2,
+  "builds": [
     {
-      "runtime": "python3.11",
-      "maxDuration": 60
+      "src": "api/*.py",
+      "use": "@vercel/python"
+    },
+    {
+      "src": "public/**",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
