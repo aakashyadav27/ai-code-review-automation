@@ -12,11 +12,16 @@ __pycache__/
 venv/
 .venv/
 ENV/
+*.egg-info/
+dist/
+build/
 
 # IDE
 .idea/
+.vscode/
 *.swp
 *.swo
+*.sublime-*
 
 # Vercel
 .vercel
@@ -27,3 +32,9 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Test/Debug files
+debug_*.py
+test_*.py
+!test_local.py
+!test_samples/
