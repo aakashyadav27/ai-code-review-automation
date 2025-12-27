@@ -1,8 +1,8 @@
 {
   "version": 2,
   "rewrites": [
-    { "source": "/", "destination": "/public/index.html" },
-    { "source": "/config.html", "destination": "/public/config.html" },
-    { "source": "/api/:path*", "destination": "/api/:path*" }
+    { "source": "/", "destination": "/index.html" },
+    { "source": "/config.html", "destination": "/config.html" },
+    { "source": "/((?!api/).*)", "destination": "/$1" }
   ]
 }
