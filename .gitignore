@@ -38,3 +38,4 @@ debug_*.py
 test_*.py
 !test_local.py
 !test_samples/
+.env*.local
