@@ -1,11 +1,15 @@
 {
   "version": 2,
   "builds": [
-    { "src": "public/**", "use": "@vercel/static" }
+    { "src": "public/**", "use": "@vercel/static" },
+    { "src": "api/*.py", "use": "@vercel/python" }
   ],
   "routes": [
     { "src": "/", "dest": "/public/index.html" },
     { "src": "/config.html", "dest": "/public/config.html" },
-    { "src": "/api/(.*)", "dest": "/api/$1.py" }
+    { "src": "/api/webhook", "dest": "/api/webhook.py" },
+    { "src": "/api/config", "dest": "/api/config.py" },
+    { "src": "/api/install", "dest": "/api/install.py" },
+    { "src": "/api/health", "dest": "/api/index.py" }
   ]
 }
