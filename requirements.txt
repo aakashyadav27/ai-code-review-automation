@@ -1,0 +1,24 @@
+# Core
+fastapi>=0.104.0
+uvicorn>=0.24.0
+python-dotenv>=1.0.0
+
+# GitHub Integration
+PyGithub>=2.1.1
+httpx>=0.25.0
+
+# Google Gemini
+google-generativeai>=0.3.0
+
+# Groq (fallback LLM)
+groq>=0.4.0
+
+# Database
+supabase>=2.0.0
+
+# Security
+cryptography>=41.0.0
+PyJWT>=2.8.0
+
+# Utilities
+pydantic>=2.5.0

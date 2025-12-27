@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Code Review - Configuration</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: #e8e8e8;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .logo h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, #00d4ff, #7c3aed);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo p {
+            color: #888;
+            margin-top: 8px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .card h2 {
+            font-size: 1.25rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.3);
+            color: #fff;
+            font-size: 1rem;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #00d4ff;
+            box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.2);
+        }
+
+        .toggle-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .toggle-group:last-child {
+            border-bottom: none;
+        }
+
+        .toggle-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toggle-label span {
+            font-size: 1.2rem;
+        }
+
+        .toggle {
+            position: relative;
+            width: 50px;
+            height: 26px;
+        }
+
+        .toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.2);
+            transition: 0.3s;
+            border-radius: 26px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+
+        .toggle input:checked + .toggle-slider {
+            background: linear-gradient(135deg, #00d4ff, #7c3aed);
+        }
+
+        .toggle input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #00d4ff, #7c3aed);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 212, 255, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .status {
+            text-align: center;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 16px;
+            display: none;
+        }
+
+        .status.success {
+            display: block;
+            background: rgba(34, 197, 94, 0.2);
+            border: 1px solid rgba(34, 197, 94, 0.5);
+            color: #22c55e;
+        }
+
+        .status.error {
+            display: block;
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.5);
+            color: #ef4444;
+        }
+
+        .info-box {
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .info-box a {
+            color: #00d4ff;
+            text-decoration: none;
+        }
+
+        .info-box a:hover {
+            text-decoration: underline;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top-color: #00d4ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <h1>🤖 AI Code Review</h1>
+            <p>Configure your code review settings</p>
+        </div>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Loading configuration...</p>
+        </div>
+
+        <div id="config-form" style="display: none;">
+            <div class="card">
+                <h2>🔑 API Key</h2>
+                
+                <div class="info-box">
+                    <strong>Get your free Gemini API key:</strong><br>
+                    1. Go to <a href="https://aistudio.google.com/apikey" target="_blank">Google AI Studio</a><br>
+                    2. Click "Create API Key"<br>
+                    3. Paste it below
+                </div>
+
+                <div class="form-group">
+                    <label for="api-key">Google Gemini API Key</label>
+                    <input type="password" id="api-key" placeholder="AIza...">
+                </div>
+
+                <p id="api-key-status" style="color: #888; font-size: 0.85rem; margin-bottom: 20px;"></p>
+            </div>
+
+            <div class="card">
+                <h2>⚙️ Review Settings</h2>
+
+                <div class="toggle-group">
+                    <div class="toggle-label">
+                        <span>🎨</span>
+                        <div>
+                            <strong>Style Review</strong>
+                            <p style="font-size: 0.8rem; color: #888;">Formatting, naming conventions</p>
+                        </div>
+                    </div>
+                    <label class="toggle">
+                        <input type="checkbox" id="toggle-style" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="toggle-group">
+                    <div class="toggle-label">
+                        <span>🔒</span>
+                        <div>
+                            <strong>Security Review</strong>
+                            <p style="font-size: 0.8rem; color: #888;">Vulnerabilities, hardcoded secrets</p>
+                        </div>
+                    </div>
+                    <label class="toggle">
+                        <input type="checkbox" id="toggle-security" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="toggle-group">
+                    <div class="toggle-label">
+                        <span>⚡</span>
+                        <div>
+                            <strong>Performance Review</strong>
+                            <p style="font-size: 0.8rem; color: #888;">Complexity, optimizations</p>
+                        </div>
+                    </div>
+                    <label class="toggle">
+                        <input type="checkbox" id="toggle-performance" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="toggle-group">
+                    <div class="toggle-label">
+                        <span>🧠</span>
+                        <div>
+                            <strong>Logic Review</strong>
+                            <p style="font-size: 0.8rem; color: #888;">Bugs, edge cases, error handling</p>
+                        </div>
+                    </div>
+                    <label class="toggle">
+                        <input type="checkbox" id="toggle-logic" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <button class="btn btn-primary" id="save-btn">Save Configuration</button>
+            
+            <div class="status" id="status"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/api';
+        let installationId = null;
+
+        // Get installation ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        installationId = urlParams.get('installation_id');
+
+        if (!installationId) {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('config-form').style.display = 'block';
+            showStatus('No installation ID provided. Please install the app from GitHub Marketplace.', 'error');
+        } else {
+            loadConfig();
+        }
+
+        async function loadConfig() {
+            document.getElementById('loading').style.display = 'block';
+            
+            try {
+                const response = await fetch(`${API_BASE}/config?installation_id=${installationId}`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Set toggle states
+                    const settings = data.settings || {};
+                    document.getElementById('toggle-style').checked = settings.review_style !== false;
+                    document.getElementById('toggle-security').checked = settings.review_security !== false;
+                    document.getElementById('toggle-performance').checked = settings.review_performance !== false;
+                    document.getElementById('toggle-logic').checked = settings.review_logic !== false;
+                    
+                    // Show API key status
+                    const statusEl = document.getElementById('api-key-status');
+                    if (data.has_api_key) {
+                        statusEl.innerHTML = '✅ API key configured';
+                        statusEl.style.color = '#22c55e';
+                    } else {
+                        statusEl.innerHTML = '⚠️ No API key configured - reviews will not work';
+                        statusEl.style.color = '#f59e0b';
+                    }
+                } else {
+                    showStatus(data.error || 'Failed to load configuration', 'error');
+                }
+            } catch (error) {
+                showStatus('Failed to connect to server: ' + error.message, 'error');
+            }
+            
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('config-form').style.display = 'block';
+        }
+
+        document.getElementById('save-btn').addEventListener('click', async () => {
+            const btn = document.getElementById('save-btn');
+            btn.disabled = true;
+            btn.textContent = 'Saving...';
+            
+            try {
+                const apiKey = document.getElementById('api-key').value.trim();
+                const settings = {
+                    review_style: document.getElementById('toggle-style').checked,
+                    review_security: document.getElementById('toggle-security').checked,
+                    review_performance: document.getElementById('toggle-performance').checked,
+                    review_logic: document.getElementById('toggle-logic').checked
+                };
+                
+                const payload = {
+                    installation_id: installationId,
+                    settings: settings
+                };
+                
+                // Only include API key if provided
+                if (apiKey) {
+                    payload.api_key = apiKey;
+                }
+                
+                const response = await fetch(`${API_BASE}/config`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showStatus('Configuration saved successfully! ✨', 'success');
+                    document.getElementById('api-key').value = '';
+                    
+                    // Update API key status
+                    if (apiKey) {
+                        const statusEl = document.getElementById('api-key-status');
+                        statusEl.innerHTML = '✅ API key configured';
+                        statusEl.style.color = '#22c55e';
+                    }
+                } else {
+                    showStatus(data.error || 'Failed to save configuration', 'error');
+                }
+            } catch (error) {
+                showStatus('Failed to save: ' + error.message, 'error');
+            }
+            
+            btn.disabled = false;
+            btn.textContent = 'Save Configuration';
+        });
+
+        function showStatus(message, type) {
+            const statusEl = document.getElementById('status');
+            statusEl.textContent = message;
+            statusEl.className = 'status ' + type;
+        }
+    </script>
+</body>
+</html>

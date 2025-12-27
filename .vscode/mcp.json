@@ -1,0 +1,57 @@
+{
+    "servers": {
+        "tavily-mcp": {
+            "command": "npx",
+            "args": [
+                "-y",
+                "tavily-mcp@0.1.2"
+            ],
+            "env": {
+                "TAVILY_API_KEY": "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"
+            }
+        },
+        "firecrawl-mcp": {
+            "command": "npx",
+            "args": [
+                "-y",
+                "firecrawl-mcp"
+            ],
+            "env": {
+                "FIRECRAWL_API_KEY": "fc-f67a10df48e24258ae997b3c240eb2ce"
+            }
+        },
+        "context7": {
+            "command": "npx",
+            "args": [
+                "-y",
+                "@upstash/context7-mcp"
+            ],
+            "env": {
+                "CONTEXT7_API_KEY": "ctx7sk-fc22315b-189b-4528-862b-af64b5a0b210"
+            }
+        },
+        "shadcn": {
+            "command": "npx",
+            "args": [
+                "shadcn@latest",
+                "mcp"
+            ]
+        },
+        "reactbits": {
+            "command": "npx",
+            "args": [
+                "reactbits-dev-mcp-server"
+            ],
+            "env": {
+                "GITHUB_TOKEN": "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"
+            }
+        },
+        "@magicuidesign/mcp": {
+            "command": "npx",
+            "args": [
+                "-y",
+                "@magicuidesign/mcp@latest"
+            ]
+        }
+    }
+}
