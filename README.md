@@ -156,6 +156,7 @@ See the [Deployment](#deployment) section for full self-hosting instructions.
 ### System Overview
 
 ```mermaid
+%%{init: {'theme': 'neutral'}}%%
 flowchart TB
     subgraph GH[GitHub]
         PR[Pull Request]
@@ -222,6 +223,7 @@ flowchart TB
 ### Security Architecture
 
 ```mermaid
+%%{init: {'theme': 'neutral'}}%%
 flowchart LR
     subgraph User[User]
         Key[API Key]
