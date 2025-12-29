@@ -153,24 +153,51 @@ See the [Deployment](#deployment) section for full self-hosting instructions.
 
 ## 🔧 How It Works
 
-```
-┌─────────────────┐     ┌──────────────────┐     ┌────────────────────────┐
-│   Pull Request  │────▶│  GitHub Webhook  │────▶│   Vercel Serverless    │
-│     Created     │     │                  │     │       Functions        │
-└─────────────────┘     └──────────────────┘     └───────────┬────────────┘
-                                                             │
-                                                             ▼
-┌─────────────────┐     ┌──────────────────┐     ┌────────────────────────┐
-│  GitHub Comment │◀────│  Combine Results │◀────│   4 AI Review Agents   │
-│   with Review   │     │                  │     │  (Style, Security...)  │
-└─────────────────┘     └──────────────────┘     └────────────────────────┘
+```mermaid
+flowchart LR
+    subgraph GitHub["🐙 GitHub"]
+        PR[("🔀 Pull Request\nCreated/Updated")]
+        Comment["💬 Review Comment\nPosted"]
+    end
+
+    subgraph Vercel["☁️ Vercel Serverless"]
+        Webhook["📨 Webhook\nHandler"]
+        Fetch["📥 Fetch\nChanged Files"]
+        Synth["🔄 Synthesize\nResults"]
+    end
+
+    subgraph Agents["🤖 AI Review Agents"]
+        direction TB
+        Style["🎨 Style Agent"]
+        Security["🔒 Security Agent"]
+        Perf["⚡ Performance Agent"]
+        Logic["🧠 Logic Agent"]
+    end
+
+    subgraph AI["✨ Google Gemini"]
+        LLM[("🧠 Gemini 2.0\nFlash")]
+    end
+
+    PR -->|"webhook"| Webhook
+    Webhook --> Fetch
+    Fetch --> Style & Security & Perf & Logic
+    Style & Security & Perf & Logic <-->|"analyze"| LLM
+    Style & Security & Perf & Logic --> Synth
+    Synth -->|"post comment"| Comment
+
+    style GitHub fill:#24292e,stroke:#fff,color:#fff
+    style Vercel fill:#000,stroke:#fff,color:#fff
+    style Agents fill:#1a1a2e,stroke:#4cc9f0,color:#fff
+    style AI fill:#4285f4,stroke:#fff,color:#fff
 ```
 
-1. **Webhook Trigger** — When a PR is opened/updated, GitHub sends a webhook
-2. **Code Fetching** — The app fetches changed files using the GitHub API
-3. **Parallel Analysis** — All 4 agents analyze the code concurrently
-4. **Smart Synthesis** — Results are combined and deduplicated
-5. **PR Comment** — A structured review is posted as a PR comment
+**Flow:**
+1. **PR Event** → GitHub sends a webhook when a pull request is opened or updated
+2. **Fetch Files** → The webhook handler fetches all changed files via GitHub API
+3. **Parallel Analysis** → All 4 specialized agents analyze the code concurrently
+4. **AI Processing** → Each agent uses Google Gemini to detect issues
+5. **Synthesize** → Results are combined, deduplicated, and formatted
+6. **Post Review** → A comprehensive review comment is posted on the PR
 
 ---
 
