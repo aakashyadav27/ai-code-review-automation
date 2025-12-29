@@ -157,61 +157,53 @@ See the [Deployment](#deployment) section for full self-hosting instructions.
 
 ```mermaid
 flowchart TB
-    subgraph GH["<img src='https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png' width='20'/> GitHub"]
-        PR["🔀 Pull Request<br/>opened / synchronized"]
-        Review["💬 PR Review Comment"]
+    subgraph GH[GitHub]
+        PR[Pull Request]
+        Review[Review Comment]
     end
 
-    subgraph VC["▲ Vercel Edge"]
-        WH["📨 Webhook Handler<br/><code>/api/webhook</code>"]
-        Auth["🔐 Verify Signature"]
-        Fetch["📥 Fetch Changed Files<br/>via GitHub API"]
+    subgraph VC[Vercel Serverless]
+        WH[Webhook Handler]
+        Auth[Verify Signature]
+        Fetch[Fetch Changed Files]
     end
 
-    subgraph DB["<b>Supabase PostgreSQL</b>"]
-        Users[("👤 Users &<br/>Installations")]
-        Keys[("🔑 Encrypted<br/>API Keys")]
+    subgraph DB[Supabase]
+        Users[(Users Table)]
+        Keys[(Encrypted Keys)]
     end
 
-    subgraph AGENTS["🤖 Parallel AI Agents"]
-        direction LR
-        A1["🎨 Style<br/><i>naming, formatting</i>"]
-        A2["🔒 Security<br/><i>vulnerabilities, secrets</i>"]
-        A3["⚡ Performance<br/><i>complexity, memory</i>"]
-        A4["🧠 Logic<br/><i>bugs, edge cases</i>"]
+    subgraph AGENTS[AI Review Agents]
+        A1[Style Agent]
+        A2[Security Agent]
+        A3[Performance Agent]
+        A4[Logic Agent]
     end
 
-    subgraph LLM["✨ Google AI"]
-        Gemini[("🌟 Gemini 2.0 Flash<br/><i>via user's API key</i>")]
+    subgraph LLM[Google AI]
+        Gemini[(Gemini 2.0 Flash)]
     end
 
-    Synth["🔄 Synthesize & Format<br/>Markdown Comment"]
+    Synth[Synthesize Results]
 
-    %% Flow
-    PR -->|"webhook event"| WH
+    PR --> WH
     WH --> Auth
-    Auth -->|"lookup installation"| Users
-    Users -->|"decrypt key"| Keys
+    Auth --> Users
+    Users --> Keys
     Auth --> Fetch
-    Fetch --> A1 & A2 & A3 & A4
-    A1 & A2 & A3 & A4 <-->|"analyze code"| Gemini
-    A1 & A2 & A3 & A4 --> Synth
-    Synth -->|"post via GitHub API"| Review
-
-    %% Styling
-    classDef github fill:#24292e,stroke:#fff,color:#fff
-    classDef vercel fill:#000,stroke:#fff,color:#fff
-    classDef db fill:#3ECF8E,stroke:#fff,color:#000
-    classDef agents fill:#1a1a2e,stroke:#4cc9f0,color:#fff
-    classDef llm fill:#4285f4,stroke:#fff,color:#fff
-    classDef synth fill:#6366f1,stroke:#fff,color:#fff
-
-    class GH github
-    class VC vercel
-    class DB db
-    class AGENTS agents
-    class LLM llm
-    class Synth synth
+    Fetch --> A1
+    Fetch --> A2
+    Fetch --> A3
+    Fetch --> A4
+    A1 <--> Gemini
+    A2 <--> Gemini
+    A3 <--> Gemini
+    A4 <--> Gemini
+    A1 --> Synth
+    A2 --> Synth
+    A3 --> Synth
+    A4 --> Synth
+    Synth --> Review
 ```
 
 ### Data Flow
@@ -231,35 +223,30 @@ flowchart TB
 
 ```mermaid
 flowchart LR
-    subgraph User["👤 User"]
-        Key["Gemini API Key"]
+    subgraph User[User]
+        Key[API Key]
     end
 
-    subgraph App["🔒 Application"]
-        Encrypt["AES-256<br/>Encryption"]
-        Decrypt["Runtime<br/>Decryption"]
+    subgraph App[Application]
+        Encrypt[AES-256 Encrypt]
+        Decrypt[Runtime Decrypt]
     end
 
-    subgraph Storage["💾 Supabase"]
-        Encrypted[("🔐 Encrypted<br/>Key Storage")]
+    subgraph Storage[Supabase]
+        Encrypted[(Encrypted Storage)]
     end
 
-    subgraph Usage["✨ API Call"]
-        Gemini["Gemini API"]
+    subgraph Usage[API Call]
+        Gemini[Gemini API]
     end
 
-    Key -->|"encrypt"| Encrypt
-    Encrypt -->|"store"| Encrypted
-    Encrypted -->|"retrieve"| Decrypt
-    Decrypt -->|"use once"| Gemini
-
-    style User fill:#e3f2fd,stroke:#1976d2,color:#000
-    style App fill:#fff3e0,stroke:#f57c00,color:#000
-    style Storage fill:#e8f5e9,stroke:#388e3c,color:#000
-    style Usage fill:#fce4ec,stroke:#c2185b,color:#000
+    Key --> Encrypt
+    Encrypt --> Encrypted
+    Encrypted --> Decrypt
+    Decrypt --> Gemini
 ```
 
-> **Your API key never touches our servers in plain text.** It's encrypted client-side before storage and only decrypted in memory during the review process.
+> **Your API key never touches our servers in plain text.** It's encrypted before storage and only decrypted in memory during the review process.
 
 ---
 
