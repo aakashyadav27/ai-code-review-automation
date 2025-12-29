@@ -151,53 +151,115 @@ See the [Deployment](#deployment) section for full self-hosting instructions.
 
 ---
 
-## 🔧 How It Works
+## 🏗️ Architecture
+
+### System Overview
+
+```mermaid
+flowchart TB
+    subgraph GH["<img src='https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png' width='20'/> GitHub"]
+        PR["🔀 Pull Request<br/>opened / synchronized"]
+        Review["💬 PR Review Comment"]
+    end
+
+    subgraph VC["▲ Vercel Edge"]
+        WH["📨 Webhook Handler<br/><code>/api/webhook</code>"]
+        Auth["🔐 Verify Signature"]
+        Fetch["📥 Fetch Changed Files<br/>via GitHub API"]
+    end
+
+    subgraph DB["<b>Supabase PostgreSQL</b>"]
+        Users[("👤 Users &<br/>Installations")]
+        Keys[("🔑 Encrypted<br/>API Keys")]
+    end
+
+    subgraph AGENTS["🤖 Parallel AI Agents"]
+        direction LR
+        A1["🎨 Style<br/><i>naming, formatting</i>"]
+        A2["🔒 Security<br/><i>vulnerabilities, secrets</i>"]
+        A3["⚡ Performance<br/><i>complexity, memory</i>"]
+        A4["🧠 Logic<br/><i>bugs, edge cases</i>"]
+    end
+
+    subgraph LLM["✨ Google AI"]
+        Gemini[("🌟 Gemini 2.0 Flash<br/><i>via user's API key</i>")]
+    end
+
+    Synth["🔄 Synthesize & Format<br/>Markdown Comment"]
+
+    %% Flow
+    PR -->|"webhook event"| WH
+    WH --> Auth
+    Auth -->|"lookup installation"| Users
+    Users -->|"decrypt key"| Keys
+    Auth --> Fetch
+    Fetch --> A1 & A2 & A3 & A4
+    A1 & A2 & A3 & A4 <-->|"analyze code"| Gemini
+    A1 & A2 & A3 & A4 --> Synth
+    Synth -->|"post via GitHub API"| Review
+
+    %% Styling
+    classDef github fill:#24292e,stroke:#fff,color:#fff
+    classDef vercel fill:#000,stroke:#fff,color:#fff
+    classDef db fill:#3ECF8E,stroke:#fff,color:#000
+    classDef agents fill:#1a1a2e,stroke:#4cc9f0,color:#fff
+    classDef llm fill:#4285f4,stroke:#fff,color:#fff
+    classDef synth fill:#6366f1,stroke:#fff,color:#fff
+
+    class GH github
+    class VC vercel
+    class DB db
+    class AGENTS agents
+    class LLM llm
+    class Synth synth
+```
+
+### Data Flow
+
+| Step | Component | Description |
+|:----:|-----------|-------------|
+| 1️⃣ | **GitHub** | PR is opened or updated, triggering a webhook |
+| 2️⃣ | **Webhook Handler** | Verifies GitHub signature, authenticates request |
+| 3️⃣ | **Supabase** | Retrieves user's encrypted Gemini API key |
+| 4️⃣ | **GitHub API** | Fetches the actual code diff and changed files |
+| 5️⃣ | **4 AI Agents** | Run in parallel, each analyzing for specific issues |
+| 6️⃣ | **Gemini 2.0** | Processes code with specialized prompts per agent |
+| 7️⃣ | **Synthesizer** | Combines results, removes duplicates, formats markdown |
+| 8️⃣ | **GitHub API** | Posts the review as a PR comment |
+
+### Security Architecture
 
 ```mermaid
 flowchart LR
-    subgraph GitHub["🐙 GitHub"]
-        PR[("🔀 Pull Request\nCreated/Updated")]
-        Comment["💬 Review Comment\nPosted"]
+    subgraph User["👤 User"]
+        Key["Gemini API Key"]
     end
 
-    subgraph Vercel["☁️ Vercel Serverless"]
-        Webhook["📨 Webhook\nHandler"]
-        Fetch["📥 Fetch\nChanged Files"]
-        Synth["🔄 Synthesize\nResults"]
+    subgraph App["🔒 Application"]
+        Encrypt["AES-256<br/>Encryption"]
+        Decrypt["Runtime<br/>Decryption"]
     end
 
-    subgraph Agents["🤖 AI Review Agents"]
-        direction TB
-        Style["🎨 Style Agent"]
-        Security["🔒 Security Agent"]
-        Perf["⚡ Performance Agent"]
-        Logic["🧠 Logic Agent"]
+    subgraph Storage["💾 Supabase"]
+        Encrypted[("🔐 Encrypted<br/>Key Storage")]
     end
 
-    subgraph AI["✨ Google Gemini"]
-        LLM[("🧠 Gemini 2.0\nFlash")]
+    subgraph Usage["✨ API Call"]
+        Gemini["Gemini API"]
     end
 
-    PR -->|"webhook"| Webhook
-    Webhook --> Fetch
-    Fetch --> Style & Security & Perf & Logic
-    Style & Security & Perf & Logic <-->|"analyze"| LLM
-    Style & Security & Perf & Logic --> Synth
-    Synth -->|"post comment"| Comment
+    Key -->|"encrypt"| Encrypt
+    Encrypt -->|"store"| Encrypted
+    Encrypted -->|"retrieve"| Decrypt
+    Decrypt -->|"use once"| Gemini
 
-    style GitHub fill:#24292e,stroke:#fff,color:#fff
-    style Vercel fill:#000,stroke:#fff,color:#fff
-    style Agents fill:#1a1a2e,stroke:#4cc9f0,color:#fff
-    style AI fill:#4285f4,stroke:#fff,color:#fff
+    style User fill:#e3f2fd,stroke:#1976d2,color:#000
+    style App fill:#fff3e0,stroke:#f57c00,color:#000
+    style Storage fill:#e8f5e9,stroke:#388e3c,color:#000
+    style Usage fill:#fce4ec,stroke:#c2185b,color:#000
 ```
 
-**Flow:**
-1. **PR Event** → GitHub sends a webhook when a pull request is opened or updated
-2. **Fetch Files** → The webhook handler fetches all changed files via GitHub API
-3. **Parallel Analysis** → All 4 specialized agents analyze the code concurrently
-4. **AI Processing** → Each agent uses Google Gemini to detect issues
-5. **Synthesize** → Results are combined, deduplicated, and formatted
-6. **Post Review** → A comprehensive review comment is posted on the PR
+> **Your API key never touches our servers in plain text.** It's encrypted client-side before storage and only decrypted in memory during the review process.
 
 ---
 
