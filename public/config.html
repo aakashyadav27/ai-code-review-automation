@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -146,11 +147,11 @@
             border-radius: 50%;
         }
 
-        .toggle input:checked + .toggle-slider {
+        .toggle input:checked+.toggle-slider {
             background: linear-gradient(135deg, #00d4ff, #7c3aed);
         }
 
-        .toggle input:checked + .toggle-slider:before {
+        .toggle input:checked+.toggle-slider:before {
             transform: translateX(24px);
         }
 
@@ -239,10 +240,13 @@
         }
 
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <div class="logo">
@@ -258,17 +262,32 @@
         <div id="config-form" style="display: none;">
             <div class="card">
                 <h2>🔑 API Key</h2>
-                
+
                 <div class="info-box">
-                    <strong>Get your free Gemini API key:</strong><br>
-                    1. Go to <a href="https://aistudio.google.com/apikey" target="_blank">Google AI Studio</a><br>
-                    2. Click "Create API Key"<br>
-                    3. Paste it below
+                    <strong>Choose your LLM provider:</strong><br>
+                    • <a href="https://aistudio.google.com/apikey" target="_blank">Google Gemini</a> - Free, powerful,
+                    recommended<br>
+                    • <a href="https://console.groq.com/keys" target="_blank">Groq</a> - Fast inference, free tier
+                    available
                 </div>
 
                 <div class="form-group">
-                    <label for="api-key">Google Gemini API Key</label>
-                    <input type="password" id="api-key" placeholder="AIza...">
+                    <label for="llm-provider">LLM Provider</label>
+                    <select id="llm-provider"
+                        style="width: 100%; padding: 14px 16px; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 8px; background: rgba(0, 0, 0, 0.3); color: #fff; font-size: 1rem;">
+                        <option value="gemini">Google Gemini (Recommended)</option>
+                        <option value="groq">Groq (Fast Inference)</option>
+                    </select>
+                </div>
+
+                <div class="form-group" id="gemini-key-group">
+                    <label for="gemini-api-key">Google Gemini API Key</label>
+                    <input type="password" id="gemini-api-key" placeholder="AIza...">
+                </div>
+
+                <div class="form-group" id="groq-key-group" style="display: none;">
+                    <label for="groq-api-key">Groq API Key</label>
+                    <input type="password" id="groq-api-key" placeholder="gsk_...">
                 </div>
 
                 <p id="api-key-status" style="color: #888; font-size: 0.85rem; margin-bottom: 20px;"></p>
@@ -335,7 +354,7 @@
             </div>
 
             <button class="btn btn-primary" id="save-btn">Save Configuration</button>
-            
+
             <div class="status" id="status"></div>
         </div>
     </div>
@@ -358,11 +377,11 @@
 
         async function loadConfig() {
             document.getElementById('loading').style.display = 'block';
-            
+
             try {
                 const response = await fetch(`${API_BASE}/config?installation_id=${installationId}`);
                 const data = await response.json();
-                
+
                 if (response.ok) {
                     // Set toggle states
                     const settings = data.settings || {};
@@ -370,12 +389,15 @@
                     document.getElementById('toggle-security').checked = settings.review_security !== false;
                     document.getElementById('toggle-performance').checked = settings.review_performance !== false;
                     document.getElementById('toggle-logic').checked = settings.review_logic !== false;
-                    
+
                     // Show API key status
                     const statusEl = document.getElementById('api-key-status');
                     if (data.has_api_key) {
-                        statusEl.innerHTML = '✅ API key configured';
+                        const provider = data.llm_provider || 'gemini';
+                        statusEl.innerHTML = `✅ ${provider.charAt(0).toUpperCase() + provider.slice(1)} API key configured`;
                         statusEl.style.color = '#22c55e';
+                        document.getElementById('llm-provider').value = provider;
+                        updateProviderFields();
                     } else {
                         statusEl.innerHTML = '⚠️ No API key configured - reviews will not work';
                         statusEl.style.color = '#f59e0b';
@@ -386,51 +408,74 @@
             } catch (error) {
                 showStatus('Failed to connect to server: ' + error.message, 'error');
             }
-            
+
             document.getElementById('loading').style.display = 'none';
             document.getElementById('config-form').style.display = 'block';
+        }
+
+        // Provider switching
+        document.getElementById('llm-provider').addEventListener('change', updateProviderFields);
+
+        function updateProviderFields() {
+            const provider = document.getElementById('llm-provider').value;
+            const geminiGroup = document.getElementById('gemini-key-group');
+            const groqGroup = document.getElementById('groq-key-group');
+
+            if (provider === 'gemini') {
+                geminiGroup.style.display = 'block';
+                groqGroup.style.display = 'none';
+            } else {
+                geminiGroup.style.display = 'none';
+                groqGroup.style.display = 'block';
+            }
         }
 
         document.getElementById('save-btn').addEventListener('click', async () => {
             const btn = document.getElementById('save-btn');
             btn.disabled = true;
             btn.textContent = 'Saving...';
-            
+
             try {
-                const apiKey = document.getElementById('api-key').value.trim();
+                const provider = document.getElementById('llm-provider').value;
+                const apiKey = provider === 'gemini'
+                    ? document.getElementById('gemini-api-key').value.trim()
+                    : document.getElementById('groq-api-key').value.trim();
+
                 const settings = {
                     review_style: document.getElementById('toggle-style').checked,
                     review_security: document.getElementById('toggle-security').checked,
                     review_performance: document.getElementById('toggle-performance').checked,
                     review_logic: document.getElementById('toggle-logic').checked
                 };
-                
+
                 const payload = {
                     installation_id: installationId,
-                    settings: settings
+                    settings: settings,
+                    llm_provider: provider
                 };
-                
+
                 // Only include API key if provided
                 if (apiKey) {
                     payload.api_key = apiKey;
                 }
-                
+
                 const response = await fetch(`${API_BASE}/config`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
-                
+
                 const data = await response.json();
-                
+
                 if (response.ok) {
                     showStatus('Configuration saved successfully! ✨', 'success');
-                    document.getElementById('api-key').value = '';
-                    
+                    document.getElementById('gemini-api-key').value = '';
+                    document.getElementById('groq-api-key').value = '';
+
                     // Update API key status
                     if (apiKey) {
                         const statusEl = document.getElementById('api-key-status');
-                        statusEl.innerHTML = '✅ API key configured';
+                        statusEl.innerHTML = `✅ ${provider.charAt(0).toUpperCase() + provider.slice(1)} API key configured`;
                         statusEl.style.color = '#22c55e';
                     }
                 } else {
@@ -439,7 +484,7 @@
             } catch (error) {
                 showStatus('Failed to save: ' + error.message, 'error');
             }
-            
+
             btn.disabled = false;
             btn.textContent = 'Save Configuration';
         });
@@ -451,4 +496,5 @@
         }
     </script>
 </body>
+
 </html>

@@ -5,7 +5,7 @@
 <h1 align="center">AI Code Review Automation</h1>
 
 <p align="center">
-  <strong>Automated pull request reviews powered by Google Gemini AI</strong>
+  <strong>Automated pull request reviews powered by AI (Gemini & Groq)</strong>
 </p>
 
 <p align="center">
@@ -22,7 +22,7 @@
   <img src="https://img.shields.io/badge/Python-3.9+-blue.svg" alt="Python Version">
   <img src="https://img.shields.io/badge/License-MIT-green.svg" alt="License">
   <img src="https://img.shields.io/badge/Platform-GitHub%20App-black.svg" alt="Platform">
-  <img src="https://img.shields.io/badge/LLM-Google%20Gemini-orange.svg" alt="LLM">
+  <img src="https://img.shields.io/badge/LLM-Gemini%20|%20Groq-orange.svg" alt="LLM">
 </p>
 
 ---
@@ -31,7 +31,7 @@
 
 **AI Code Review Automation** is a GitHub App that automatically reviews your pull requests using **4 specialized AI agents**. Each agent focuses on a specific aspect of code quality, providing comprehensive feedback that helps catch issues before they reach production.
 
-> **BYO API Key** — Users bring their own Google Gemini API key. No subscription required, pay only for what you use.
+> **BYO API Key** — Users bring their own API key (Google Gemini or Groq). No subscription required, pay only for what you use.
 
 ---
 
